@@ -7,9 +7,7 @@ smart contract allows users to deposit native CAM tokens and receive WCAM tokens
 in return. Conversely, WCAM tokens can be redeemed (burned) in exchange for their
 equivalent value in native CAM.
 
-_ERC20 token that represents wrapped CAM. Users can deposit native CAM
-and receive WCAM tokens, which can be redeemed (burned) in exchange for native
-CAM. Also includes additional logic to prevent WCAM tokens from being transferred
+_Also includes additional logic to prevent WCAM tokens from being transferred
 directly to the WCAM contract itself._
 
 ### Deposit
@@ -126,19 +124,41 @@ sending the CAM to the `to` address.
 ### withdrawFrom
 
 ```solidity
-function withdrawFrom(address account, address to, uint256 amount) external
+function withdrawFrom(address from, address to, uint256 amount) public
 ```
 
-Withdraw native CAM by burning WCAM tokens from `account` (using allowance)
+Withdraw native CAM by burning WCAM tokens from `from` (using allowance)
 and sending the CAM to the `to` address.
 
 #### Parameters
 
-| Name    | Type    | Description                                                                                                                       |
-| ------- | ------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| account | address | The address from which the tokens will be burned.                                                                                 |
-| to      | address | The address which will receive the native CAM.                                                                                    |
-| amount  | uint256 | The amount of WCAM tokens to burn. Requirements: - The caller must have an allowance for `account`’s tokens of at least `amount`. |
+| Name   | Type    | Description                                                                                                                    |
+| ------ | ------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| from   | address | The address from which the tokens will be burned.                                                                              |
+| to     | address | The address which will receive the native CAM.                                                                                 |
+| amount | uint256 | The amount of WCAM tokens to burn. Requirements: - The caller must have an allowance for `from`’s tokens of at least `amount`. |
+
+### withdrawFromWithPermit
+
+```solidity
+function withdrawFromWithPermit(address from, address to, uint256 permitAmount, uint256 withdrawAmount, uint256 deadline, uint8 v, bytes32 r, bytes32 s) external
+```
+
+Withdraw native CAM from `from` using a permit-based allowance.
+Burns `amount` of WCAM tokens and sends native CAM to `to` address.
+
+#### Parameters
+
+| Name           | Type    | Description                                                                                                                                                                        |
+| -------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| from           | address | The address from which the tokens will be burned.                                                                                                                                  |
+| to             | address | The address which will receive the native CAM.                                                                                                                                     |
+| permitAmount   | uint256 | The amount of `from`'s WCAM tokens to approve for `msg.sender`.                                                                                                                    |
+| withdrawAmount | uint256 | The amount of WCAM tokens to withdraw to `to`.                                                                                                                                     |
+| deadline       | uint256 | The deadline timestamp by which the permit must be valid.                                                                                                                          |
+| v              | uint8   | The recovery byte of the permit's signature.                                                                                                                                       |
+| r              | bytes32 | Half of the permit's ECDSA signature pair.                                                                                                                                         |
+| s              | bytes32 | Half of the permit's ECDSA signature pair. Requirements: - The caller must supply a valid signature permitting them to spend at least `withdrawAmount` of WCAM tokens from `from`. |
 
 ### receive
 
