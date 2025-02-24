@@ -619,17 +619,18 @@ describe("WrappedCAM", function () {
         it("Should withdrawFromWithPermit", async function () {
             const { wrappedCAM, owner, spender, depositor2 } = await loadFixture(deployWrappedCAMFixture);
 
-            const value = ethers.parseEther("10");
+            const permitAmount = ethers.parseEther("10");
+            const withdrawAmount = ethers.parseEther("2");
             const nonce = await wrappedCAM.nonces(owner.address);
             const deadline = Math.floor(Date.now() / 1000) + 3600;
 
             const to = depositor2; // use depositor2 as recipient
 
             // Deposit CAM.
-            await wrappedCAM.connect(owner).deposit({ value });
+            await wrappedCAM.connect(owner).deposit({ value: permitAmount });
 
             // Sign the permit with the owner
-            const flatSig = await signPermit(wrappedCAM, owner, owner, spender, value, nonce, deadline);
+            const flatSig = await signPermit(wrappedCAM, owner, owner, spender, permitAmount, nonce, deadline);
             const { v, r, s } = ethers.Signature.from(flatSig);
 
             // Before permit: allowance should be 0.
@@ -638,25 +639,32 @@ describe("WrappedCAM", function () {
             // Call withdrawFromWithPermit.
             const withdrawTx = await wrappedCAM
                 .connect(spender)
-                .withdrawFromWithPermit(owner.address, to, value, deadline, v, r, s);
+                .withdrawFromWithPermit(owner.address, to, permitAmount, withdrawAmount, deadline, v, r, s);
 
             // Check ETH balance change.
-            await expect(withdrawTx).to.changeEtherBalances([owner, to, wrappedCAM], [0, value, -value]);
+            await expect(withdrawTx).to.changeEtherBalances(
+                [owner, to, wrappedCAM],
+                [0, withdrawAmount, -withdrawAmount],
+            );
 
             // Check WCAM balance change.
-            await expect(withdrawTx).to.changeTokenBalances(wrappedCAM, [owner, spender, to], [-value, 0, 0]);
+            await expect(withdrawTx).to.changeTokenBalances(wrappedCAM, [owner, spender, to], [-withdrawAmount, 0, 0]);
 
             // Check Transfer event emission.
-            await expect(withdrawTx).to.emit(wrappedCAM, "Transfer").withArgs(owner.address, ethers.ZeroAddress, value);
+            await expect(withdrawTx)
+                .to.emit(wrappedCAM, "Transfer")
+                .withArgs(owner.address, ethers.ZeroAddress, withdrawAmount);
 
             // Check Approval event emission.
-            await expect(withdrawTx).to.emit(wrappedCAM, "Approval").withArgs(owner.address, spender.address, value);
+            await expect(withdrawTx)
+                .to.emit(wrappedCAM, "Approval")
+                .withArgs(owner.address, spender.address, permitAmount);
 
             // Check Withdrawal event emission.
-            await expect(withdrawTx).to.emit(wrappedCAM, "Withdrawal").withArgs(owner.address, to, value);
+            await expect(withdrawTx).to.emit(wrappedCAM, "Withdrawal").withArgs(owner.address, to, withdrawAmount);
 
             // Check that the allowance and nonce are updated.
-            expect(await wrappedCAM.allowance(owner.address, spender.address)).to.equal(0);
+            expect(await wrappedCAM.allowance(owner.address, spender.address)).to.equal(permitAmount - withdrawAmount);
             expect(await wrappedCAM.nonces(owner.address)).to.equal(nonce + 1n);
         });
     });

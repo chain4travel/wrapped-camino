@@ -100,16 +100,16 @@ contract WrappedCAM is ERC20, ERC20Permit {
     }
 
     /**
-     * @notice Withdraw native CAM by burning WCAM tokens from `account` (using allowance)
+     * @notice Withdraw native CAM by burning WCAM tokens from `from` (using allowance)
      * and sending the CAM to the `to` address.
-     * @param account The address from which the tokens will be burned.
+     * @param from The address from which the tokens will be burned.
      * @param to The address which will receive the native CAM.
      * @param amount The amount of WCAM tokens to burn.
      *
      * Requirements:
-     * - The caller must have an allowance for `account`’s tokens of at least `amount`.
+     * - The caller must have an allowance for `from`’s tokens of at least `amount`.
      */
-    function withdrawFrom(address account, address to, uint256 amount) public {
+    function withdrawFrom(address from, address to, uint256 amount) public {
         if (to == address(this)) {
             revert CannotSendWCAMToThisContract();
         }
@@ -117,18 +117,25 @@ contract WrappedCAM is ERC20, ERC20Permit {
         if (to == address(0)) {
             revert ERC20InvalidReceiver(to);
         }
-        _spendAllowance(account, msg.sender, amount);
-        _burn(account, amount);
+        _spendAllowance(from, msg.sender, amount);
+        _burn(from, amount);
         payable(to).sendValue(amount);
-        emit Withdrawal(account, to, amount);
+        emit Withdrawal(from, to, amount);
     }
 
+    // FIXME: I believe we do not need this function below. This can be implemented
+    // easily by any smart contract's own logic if needed. I can't think of any use
+    // case other then that EOAs can also use this function to withdraw from any
+    // address they acquire a permit from, which I believe should be done by first
+    // deploying a contract. ~Ekrem
+
     /**
-     * @notice Withdraw native CAM from `account` using a permit-based allowance.
+     * @notice Withdraw native CAM from `from` using a permit-based allowance.
      * Burns `amount` of WCAM tokens and sends native CAM to `to` address.
-     * @param account The address from which the tokens will be burned.
+     * @param from The address from which the tokens will be burned.
      * @param to The address which will receive the native CAM.
-     * @param amount The amount of WCAM tokens to burn.
+     * @param permitAmount The amount of `from`'s WCAM tokens to approve for `msg.sender`.
+     * @param withdrawAmount The amount of WCAM tokens to withdraw to `to`.
      * @param deadline The deadline timestamp by which the permit must be valid.
      * @param v The recovery byte of the permit's signature.
      * @param r Half of the permit's ECDSA signature pair.
@@ -136,22 +143,23 @@ contract WrappedCAM is ERC20, ERC20Permit {
      *
      * Requirements:
      * - The caller must supply a valid signature permitting them to spend at least
-     *   `amount` WCAM tokens from `account`.
+     *   `withdrawAmount` of WCAM tokens from `from`.
      */
     function withdrawFromWithPermit(
-        address account,
+        address from,
         address to,
-        uint256 amount,
+        uint256 permitAmount,
+        uint256 withdrawAmount,
         uint256 deadline,
         uint8 v,
         bytes32 r,
         bytes32 s
     ) external {
-        // Call permit to set the allowance for msg.sender on behalf of account.
-        permit(account, msg.sender, amount, deadline, v, r, s);
+        // Call permit to set the allowance for msg.sender on behalf of from.
+        permit(from, msg.sender, permitAmount, deadline, v, r, s);
 
         // Use the same logic as withdrawFrom() to burn tokens and send CAM.
-        withdrawFrom(account, to, amount);
+        withdrawFrom(from, to, withdrawAmount);
     }
 
     /**
