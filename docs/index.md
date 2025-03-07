@@ -42,10 +42,10 @@ Emitted when a withdrawal is made.
 | to    | address | The address that received the withdrawal.  |
 | value | uint256 | The amount of native CAM withdrawn.        |
 
-### CannotSendWCAMToThisContract
+### TokenSelfTransferProhibited
 
 ```solidity
-error CannotSendWCAMToThisContract()
+error TokenSelfTransferProhibited()
 ```
 
 Error to prevent sending WCAM tokens to the contract itself.

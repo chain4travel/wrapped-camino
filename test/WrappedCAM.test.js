@@ -201,7 +201,7 @@ describe("WrappedCAM", function () {
             // Attempt to depositTo the contract.
             await expect(
                 wrappedCAM.connect(depositor1).depositTo(wrappedCAM.getAddress(), { value: ethers.parseEther("1") }),
-            ).to.be.revertedWithCustomError(wrappedCAM, "CannotSendWCAMToThisContract");
+            ).to.be.revertedWithCustomError(wrappedCAM, "TokenSelfTransferProhibited");
         });
 
         it("Should revert depositTo if the recipient is the zero address", async function () {
@@ -331,7 +331,7 @@ describe("WrappedCAM", function () {
             // Attempt to withdrawTo the contract.
             await expect(
                 wrappedCAM.connect(depositor1).withdrawTo(wrappedCAM.getAddress(), 1n),
-            ).to.be.revertedWithCustomError(wrappedCAM, "CannotSendWCAMToThisContract");
+            ).to.be.revertedWithCustomError(wrappedCAM, "TokenSelfTransferProhibited");
         });
 
         it("Should revert withdrawTo if recipient is the zero address", async function () {
@@ -425,7 +425,7 @@ describe("WrappedCAM", function () {
             // Attempt to withdrawFrom the contract.
             await expect(
                 wrappedCAM.connect(depositor2).withdrawFrom(depositor1.address, wrappedCAM.getAddress(), 1n),
-            ).to.be.revertedWithCustomError(wrappedCAM, "CannotSendWCAMToThisContract");
+            ).to.be.revertedWithCustomError(wrappedCAM, "TokenSelfTransferProhibited");
         });
 
         it("Should revert withdrawFrom if recipient is the zero address", async function () {
@@ -517,7 +517,7 @@ describe("WrappedCAM", function () {
             // Attempt to send WCAM tokens to the WrappedCAM contract.
             await expect(
                 wrappedCAM.connect(depositor1).transfer(wrappedCAM.getAddress(), depositAmount),
-            ).to.be.revertedWithCustomError(wrappedCAM, "CannotSendWCAMToThisContract");
+            ).to.be.revertedWithCustomError(wrappedCAM, "TokenSelfTransferProhibited");
         });
 
         it("Should prevent sending WCAM tokens to the WrappedCAM contract via transferFrom", async function () {
@@ -532,7 +532,7 @@ describe("WrappedCAM", function () {
             // Attempt to send WCAM tokens to the WrappedCAM contract via transferFrom.
             await expect(
                 wrappedCAM.connect(depositor2).transferFrom(depositor1.address, wrappedCAM.getAddress(), depositAmount),
-            ).to.be.revertedWithCustomError(wrappedCAM, "CannotSendWCAMToThisContract");
+            ).to.be.revertedWithCustomError(wrappedCAM, "TokenSelfTransferProhibited");
         });
     });
 

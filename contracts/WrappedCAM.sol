@@ -34,7 +34,7 @@ contract WrappedCAM is ERC20, ERC20Permit {
     event Withdrawal(address indexed from, address indexed to, uint256 value);
 
     /// @notice Error to prevent sending WCAM tokens to the contract itself.
-    error CannotSendWCAMToThisContract();
+    error TokenSelfTransferProhibited();
 
     /**
      * @notice Constructor for WrappedCAM token.
@@ -60,7 +60,7 @@ contract WrappedCAM is ERC20, ERC20Permit {
      */
     function depositTo(address to) external payable {
         if (to == address(this)) {
-            revert CannotSendWCAMToThisContract();
+            revert TokenSelfTransferProhibited();
         }
         // `_mint` function will fail if the `to` is the zero address.
         _mint(to, msg.value);
@@ -88,7 +88,7 @@ contract WrappedCAM is ERC20, ERC20Permit {
      */
     function withdrawTo(address to, uint256 amount) external {
         if (to == address(this)) {
-            revert CannotSendWCAMToThisContract();
+            revert TokenSelfTransferProhibited();
         }
         // Fail if the `to` is the zero address.
         if (to == address(0)) {
@@ -111,7 +111,7 @@ contract WrappedCAM is ERC20, ERC20Permit {
      */
     function withdrawFrom(address from, address to, uint256 amount) public {
         if (to == address(this)) {
-            revert CannotSendWCAMToThisContract();
+            revert TokenSelfTransferProhibited();
         }
         // Fail if the `to` is the zero address.
         if (to == address(0)) {
@@ -140,7 +140,7 @@ contract WrappedCAM is ERC20, ERC20Permit {
      */
     function transfer(address to, uint256 amount) public override returns (bool) {
         if (to == address(this)) {
-            revert CannotSendWCAMToThisContract();
+            revert TokenSelfTransferProhibited();
         }
         return super.transfer(to, amount);
     }
@@ -155,7 +155,7 @@ contract WrappedCAM is ERC20, ERC20Permit {
      */
     function transferFrom(address sender, address to, uint256 amount) public override returns (bool) {
         if (to == address(this)) {
-            revert CannotSendWCAMToThisContract();
+            revert TokenSelfTransferProhibited();
         }
         return super.transferFrom(sender, to, amount);
     }
