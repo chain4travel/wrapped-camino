@@ -255,10 +255,9 @@ describe("WrappedCAM", function () {
             const { wrappedCAM, depositor1 } = await loadFixture(deployWrappedCAMFixture);
 
             // Attempt to withdraw 1 aCAM (wei).
-            await expect(wrappedCAM.connect(depositor1).withdraw(1n)).to.be.revertedWithCustomError(
-                wrappedCAM,
-                "ERC20InsufficientBalance",
-            );
+            await expect(wrappedCAM.connect(depositor1).withdraw(1n))
+                .to.be.revertedWithCustomError(wrappedCAM, "ERC20InsufficientBalance")
+                .withArgs(depositor1.address, 0n, 1n);
 
             // Deposit 1 CAM.
             const depositAmount = ethers.parseEther("1");
@@ -266,10 +265,9 @@ describe("WrappedCAM", function () {
 
             // Attempt to withdraw 2 CAM.
             const withdrawAmount = ethers.parseEther("2");
-            await expect(wrappedCAM.connect(depositor1).withdraw(withdrawAmount)).to.be.revertedWithCustomError(
-                wrappedCAM,
-                "ERC20InsufficientBalance",
-            );
+            await expect(wrappedCAM.connect(depositor1).withdraw(withdrawAmount))
+                .to.be.revertedWithCustomError(wrappedCAM, "ERC20InsufficientBalance")
+                .withArgs(depositor1.address, depositAmount, withdrawAmount);
         });
 
         it("Should withdrawTo correctly", async function () {
@@ -308,9 +306,9 @@ describe("WrappedCAM", function () {
             const { wrappedCAM, depositor1, depositor2 } = await loadFixture(deployWrappedCAMFixture);
 
             // Attempt to withdrawTo 1 aCAM (wei).
-            await expect(
-                wrappedCAM.connect(depositor1).withdrawTo(depositor2.address, 1n),
-            ).to.be.revertedWithCustomError(wrappedCAM, "ERC20InsufficientBalance");
+            await expect(wrappedCAM.connect(depositor1).withdrawTo(depositor2.address, 1n))
+                .to.be.revertedWithCustomError(wrappedCAM, "ERC20InsufficientBalance")
+                .withArgs(depositor1.address, 0n, 1n);
 
             // Deposit 1 CAM.
             const depositAmount = ethers.parseEther("1");
@@ -318,9 +316,9 @@ describe("WrappedCAM", function () {
 
             // Attempt to withdrawTo 2 CAM.
             const withdrawAmount = ethers.parseEther("2");
-            await expect(
-                wrappedCAM.connect(depositor1).withdrawTo(depositor2.address, withdrawAmount),
-            ).to.be.revertedWithCustomError(wrappedCAM, "ERC20InsufficientBalance");
+            await expect(wrappedCAM.connect(depositor1).withdrawTo(depositor2.address, withdrawAmount))
+                .to.be.revertedWithCustomError(wrappedCAM, "ERC20InsufficientBalance")
+                .withArgs(depositor1.address, depositAmount, withdrawAmount);
         });
 
         it("Should revert withdrawTo if recipient is the contract", async function () {
@@ -397,9 +395,9 @@ describe("WrappedCAM", function () {
                 .reverted;
 
             // Attempt to withdrawFrom 1 aCAM (wei).
-            await expect(
-                wrappedCAM.connect(depositor2).withdrawFrom(depositor1.address, depositor2.address, 1n),
-            ).to.be.revertedWithCustomError(wrappedCAM, "ERC20InsufficientBalance");
+            await expect(wrappedCAM.connect(depositor2).withdrawFrom(depositor1.address, depositor2.address, 1n))
+                .to.be.revertedWithCustomError(wrappedCAM, "ERC20InsufficientBalance")
+                .withArgs(depositor1.address, 0n, 1n);
 
             // Deposit
             await wrappedCAM.connect(depositor1).deposit({ value: depositAmount });
@@ -408,7 +406,9 @@ describe("WrappedCAM", function () {
             const withdrawAmount = ethers.parseEther("2");
             await expect(
                 wrappedCAM.connect(depositor2).withdrawFrom(depositor1.address, depositor2.address, withdrawAmount),
-            ).to.be.revertedWithCustomError(wrappedCAM, "ERC20InsufficientBalance");
+            )
+                .to.be.revertedWithCustomError(wrappedCAM, "ERC20InsufficientBalance")
+                .withArgs(depositor1.address, depositAmount, withdrawAmount);
         });
 
         it("Should revert withdrawFrom if recipient is the contract", async function () {
