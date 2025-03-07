@@ -123,45 +123,6 @@ contract WrappedCAM is ERC20, ERC20Permit {
         emit Withdrawal(from, to, amount);
     }
 
-    // FIXME: I believe we do not need this function below. This can be implemented
-    // easily by any smart contract's own logic if needed. I can't think of any use
-    // case other then that EOAs can also use this function to withdraw from any
-    // address they acquire a permit from, which I believe should be done by first
-    // deploying a contract. ~Ekrem
-
-    /**
-     * @notice Withdraw native CAM from `from` using a permit-based allowance.
-     * Burns `amount` of WCAM tokens and sends native CAM to `to` address.
-     * @param from The address from which the tokens will be burned.
-     * @param to The address which will receive the native CAM.
-     * @param permitAmount The amount of `from`'s WCAM tokens to approve for `msg.sender`.
-     * @param withdrawAmount The amount of WCAM tokens to withdraw to `to`.
-     * @param deadline The deadline timestamp by which the permit must be valid.
-     * @param v The recovery byte of the permit's signature.
-     * @param r Half of the permit's ECDSA signature pair.
-     * @param s Half of the permit's ECDSA signature pair.
-     *
-     * Requirements:
-     * - The caller must supply a valid signature permitting them to spend at least
-     *   `withdrawAmount` of WCAM tokens from `from`.
-     */
-    function withdrawFromWithPermit(
-        address from,
-        address to,
-        uint256 permitAmount,
-        uint256 withdrawAmount,
-        uint256 deadline,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) external {
-        // Call permit to set the allowance for msg.sender on behalf of from.
-        permit(from, msg.sender, permitAmount, deadline, v, r, s);
-
-        // Use the same logic as withdrawFrom() to burn tokens and send CAM.
-        withdrawFrom(from, to, withdrawAmount);
-    }
-
     /**
      * @notice Fallback function to enable native token deposit through direct transfers
      * @dev Automatically triggers deposit() when contract receives native token
