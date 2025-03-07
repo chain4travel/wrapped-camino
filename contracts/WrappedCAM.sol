@@ -33,7 +33,9 @@ contract WrappedCAM is ERC20, ERC20Permit {
      */
     event Withdrawal(address indexed from, address indexed to, uint256 value);
 
-    /// @notice Error to prevent sending WCAM tokens to the contract itself.
+    /**
+     * @notice Error to prevent sending WCAM tokens to the contract itself.
+     */
     error TokenSelfTransferProhibited();
 
     /**
