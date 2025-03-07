@@ -76,8 +76,8 @@ contract WrappedCAM is ERC20, ERC20Permit {
      */
     function withdraw(uint256 amount) external {
         _burn(msg.sender, amount);
-        payable(msg.sender).sendValue(amount);
         emit Withdrawal(msg.sender, msg.sender, amount);
+        payable(msg.sender).sendValue(amount);
     }
 
     /**
@@ -95,8 +95,8 @@ contract WrappedCAM is ERC20, ERC20Permit {
             revert ERC20InvalidReceiver(to);
         }
         _burn(msg.sender, amount);
-        payable(to).sendValue(amount);
         emit Withdrawal(msg.sender, to, amount);
+        payable(to).sendValue(amount);
     }
 
     /**
@@ -119,8 +119,8 @@ contract WrappedCAM is ERC20, ERC20Permit {
         }
         _spendAllowance(from, msg.sender, amount);
         _burn(from, amount);
-        payable(to).sendValue(amount);
         emit Withdrawal(from, to, amount);
+        payable(to).sendValue(amount);
     }
 
     /**
