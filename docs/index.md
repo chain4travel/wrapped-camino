@@ -79,7 +79,7 @@ and emits a Deposit event._
 function depositTo(address to) external payable
 ```
 
-Deposit native CAM and mint WCAM tokens to `to` address.
+Deposits native CAM and mint WCAM tokens to the `to` address.
 
 #### Parameters
 
@@ -127,8 +127,8 @@ sending the CAM to the `to` address.
 function withdrawFrom(address from, address to, uint256 amount) public
 ```
 
-Withdraw native CAM by burning WCAM tokens from `from` (using allowance)
-and sending the CAM to the `to` address.
+Withdraw native CAM by burning WCAM tokens from the `from` address
+(using allowance) and sending the CAM to the `to` address.
 
 #### Parameters
 
@@ -146,7 +146,7 @@ receive() external payable
 
 Fallback function to enable native token deposit through direct transfers
 
-_Automatically triggers deposit() when contract receives native token_
+_Automatically triggers deposit() when native tokens are received_
 
 ### transfer
 
