@@ -57,7 +57,7 @@ contract WrappedCAM is ERC20, ERC20Permit {
     }
 
     /**
-     * @notice Deposit native CAM and mint WCAM tokens to `to` address.
+     * @notice Deposits native CAM and mint WCAM tokens to the `to` address.
      * @param to The address to receive the minted WCAM tokens.
      */
     function depositTo(address to) external payable {
@@ -102,8 +102,8 @@ contract WrappedCAM is ERC20, ERC20Permit {
     }
 
     /**
-     * @notice Withdraw native CAM by burning WCAM tokens from `from` (using allowance)
-     * and sending the CAM to the `to` address.
+     * @notice Withdraw native CAM by burning WCAM tokens from the `from` address
+     * (using allowance) and sending the CAM to the `to` address.
      * @param from The address from which the tokens will be burned.
      * @param to The address which will receive the native CAM.
      * @param amount The amount of WCAM tokens to burn.
@@ -127,7 +127,7 @@ contract WrappedCAM is ERC20, ERC20Permit {
 
     /**
      * @notice Fallback function to enable native token deposit through direct transfers
-     * @dev Automatically triggers deposit() when contract receives native token
+     * @dev Automatically triggers deposit() when native tokens are received
      */
     receive() external payable {
         deposit();
